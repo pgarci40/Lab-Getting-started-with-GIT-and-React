@@ -4,11 +4,6 @@ const app = express();
 
 const port = 8000;
 
-const findUserByName = (name) => {
-    return users["user_list"].filter(
-        (user) => user["name"] == name
-    );
-};
 app.use(express.json());
 
 const users = {
@@ -27,9 +22,29 @@ const users = {
             id: "ppp222",
             name: "Mac",
             job: "professor"
+        },
+        {
+            id: "yat999",
+            name: "Dee",
+            job: "Aspiring actress"
+        },
+        {
+            id: "zap555",
+            name: "Dennis",
+            job: "Bartender"
         }
     ]
 };
+
+const findUserByName = (name) => {
+    return users["user_list"].filter(
+        (user) => user["name"] == name
+    );
+};
+
+const findUserById = (id) =>
+    users["user_list"].find((user) => user["id"] === id);
+
 app.get("/users", (req, res) => {
     const name = req.query.name;
     if (name != undefined) {
@@ -42,8 +57,19 @@ app.get("/users", (req, res) => {
     }
 });
 
+app.get("/users/:id", (req, res) => {
+    const id = req.params["id"];
+    const result = findUserById(id);
+    if(result === undefined){
+        res.status(404).send("Resource not found.");
+    }
+    else{
+        res.json(result);
+    }
+});
+
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}/users?name=Mac`);
+  console.log(`Example app listening at http://localhost:${port}/users/zap555`);
 });
 

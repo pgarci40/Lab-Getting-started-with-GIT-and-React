@@ -54,6 +54,9 @@ const findUserById = (id) =>
     users["user_list"].find((user) => user["id"] === id);
 
 const addUser = (user) => {
+    //generateUserID
+    const id = generateUserId();
+    user.id = id;
     users["user_list"].push(user);
     return user;
 };
@@ -64,6 +67,15 @@ const deleteByUserId = (id) => {
     users.user_list.splice(idx, 1);
     return true;
 };
+
+const generateUserId = () => {
+    if(!users.user_list || users.user_list.length === 0){
+        return 1;
+    }
+    const id = users.user_list.map(user => user.id).filter(id => typeof id === "number" && !isNaN(id));
+    return Math.floor(Math.random() * 1000);
+    
+}
 
 app.delete("/users/:id", (req, res) => {
     const{id} = req.params;
@@ -76,8 +88,15 @@ app.delete("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    addUser(userToAdd);
-    res.send();
+    const newUser = addUser(userToAdd);
+
+    if(newUser){
+        res.status(201).send();
+    }
+    else{
+        res.status(400).send("User could not be created");
+    }
+
 });
 
 app.get("/users", (req, res) => {

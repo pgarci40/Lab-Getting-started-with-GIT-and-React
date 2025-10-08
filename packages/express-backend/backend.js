@@ -55,6 +55,22 @@ const addUser = (user) => {
     return user;
 };
 
+const deleteByUserId = (id) => {
+    const idx = users["user_list"].findIndex(u => u.id === id);
+    if(idx === -1) return false;
+    users.user_list.splice(idx, 1);
+    return true;
+};
+
+app.delete("/users/:id", (req, res) => {
+    const{id} = req.params;
+    if(deleteByUserId(id)){
+        return res.sendStatus(204);
+    }
+    return res.status(404).send("Resource not found.");
+});
+
+
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
     addUser(userToAdd);
@@ -62,15 +78,16 @@ app.post("/users", (req, res) => {
 });
 
 app.get("/users", (req, res) => {
-    const name = req.query.name;
-    if (name != undefined) {
-        let result = findUserByName(name);
-        result = { users_list: result};
-        res.send(result);
+    const {name, job} = req.query;
+    let result = users.user_list;
+    if(name !== undefined){
+        result = result.filter(u => u.name === name);
     }
-    else{
-        res.send(users);
+    if(job !== undefined){
+        result = result.filter(u => u.job === job);
     }
+
+    res.json({user_list:result});
 });
 
 app.get("/users/:id", (req, res) => {
@@ -83,6 +100,7 @@ app.get("/users/:id", (req, res) => {
         res.json(result);
     }
 });
+
 
 
 app.listen(port, () => {
